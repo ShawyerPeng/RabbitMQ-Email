@@ -9,7 +9,10 @@
 	"host":"smtp.163.com",
 	"port":"25",
 	"sender":"xxx@163.com",
-	"receiver":"yyy@gmail.com",
+	"receiver":[
+        "yyy@gmail.com",
+        "zzz@gmail.com"
+    ],
 	"username":"xxx@163.com",
 	"password":"password",
 	"authorization":"email_authorization_code",
