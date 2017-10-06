@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/email")
@@ -28,7 +29,7 @@ public class EmailController {
         String host = emailDto.getHost();
         String port = emailDto.getPort();
         String sender = emailDto.getSender();
-        String receiver = emailDto.getReceiver();
+        List<String> receiver = emailDto.getReceiver();
         String username = emailDto.getUsername();
         String password = emailDto.getPassword();
         String authorization = emailDto.getAuthorization();
@@ -38,29 +39,6 @@ public class EmailController {
         try {
             messagePublisherService.publish(new EmailDto(id, host, port, sender, receiver, name,
                     username, password, authorization, subject, content));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "邮件发送成功";
-    }
-
-    @RequestMapping(value = "/sendMutiple", method = RequestMethod.POST)
-    @ResponseBody
-    public String sendMutiple(@RequestBody EmailDto emailDto) {
-        Integer id = emailDto.getId();
-        String host = emailDto.getHost();
-        String port = emailDto.getPort();
-        String sender = emailDto.getSender();
-        String receiver = emailDto.getReceiver();
-        String username = emailDto.getUsername();
-        String password = emailDto.getPassword();
-        String authorization = emailDto.getAuthorization();
-        String name = emailDto.getName();
-        String subject = emailDto.getSubject();
-        String content = emailDto.getContent();
-        try {
-            messagePublisherService.publish(new EmailDto(id, host, port, sender, receiver, username,
-                    password, authorization, name, subject, content));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class EmailDto implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -9,7 +10,7 @@ public class EmailDto implements Serializable {
     private String host;            // 服务器地址
     private String port;            // 服务器端口号
     private String sender;          // 发件人邮箱
-    private String receiver;        // 收件人邮箱
+    private List<String> receiver;  // 收件人邮箱
     private String name;            // 发件人昵称
     private String username;        // 发件人账号
     private String password;        // 发件人密码
@@ -21,7 +22,7 @@ public class EmailDto implements Serializable {
     public EmailDto() {
     }
 
-    public EmailDto(Integer id, String host, String port, String sender, String receiver, String name,
+    public EmailDto(Integer id, String host, String port, String sender, List<String> receiver, String name,
                     String username, String password, String authorization, String subject, String content) {
         this.id = id;
         this.host = host;
@@ -36,7 +37,7 @@ public class EmailDto implements Serializable {
         this.content = content;
     }
 
-    public EmailDto(Integer id, String host, String port, String sender, String receiver, String name, String username,
+    public EmailDto(Integer id, String host, String port, String sender, List<String> receiver, String name, String username,
                     String password, String authorization, String subject, String content, EmailSettings emailSettings) {
         this.id = id;
         this.host = host;
@@ -85,11 +86,11 @@ public class EmailDto implements Serializable {
         this.sender = sender;
     }
 
-    public String getReceiver() {
+    public List<String> getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(String receiver) {
+    public void setReceiver(List<String> receiver) {
         this.receiver = receiver;
     }
 
@@ -156,7 +157,7 @@ public class EmailDto implements Serializable {
                 ", host='" + host + '\'' +
                 ", port='" + port + '\'' +
                 ", sender='" + sender + '\'' +
-                ", receiver='" + receiver + '\'' +
+                ", receiver=" + receiver +
                 ", name='" + name + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +

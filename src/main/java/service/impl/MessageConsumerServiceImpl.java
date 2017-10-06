@@ -38,8 +38,7 @@ public class MessageConsumerServiceImpl implements MessageConsumerService {
         Consumer consumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope,
-                                       AMQP.BasicProperties properties, byte[] body)
-                    throws IOException {
+                                       AMQP.BasicProperties properties, byte[] body) throws IOException {
                 EmailDto emailDto = (EmailDto) fromBytes(body);
                 System.out.println("[x] Received '" + emailDto + "'");
 

@@ -33,7 +33,6 @@ public class MessagePublisherServiceImpl implements MessagePublisherService {
 
     public void publish(EmailDto emailDto) throws IOException {
         channel.basicPublish("", QUEUE_NAME, null, toBytes(emailDto));
-
         System.out.println("[x] Sent '" + emailDto + "'");
     }
 
