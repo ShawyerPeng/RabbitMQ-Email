@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/rabbit
+     http://www.springframework.org/schema/rabbit/spring-rabbit-1.2.xsd">
+
+    <!-- 配置 connection-factory，指定连接 rabprodurcerrver 参数 -->
+    <rabbit:connection-factory id="connectionFactory" username="guest" password="guest" host="127.0.0.1" port="5672"/>
+
+    <!-- 定义 rabbit template 用于数据的接收和发送 -->
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" exchange="exchangeTest"/>
+
+    <!-- 通过指定下面的 admin 信息，当前 producer 中的 exchange 和 queue 会在 rabbitmq 服务器上自动生成 -->
+    <rabbit:admin id="connectAdmin" connection-factory="connectionFactory"/>
+
+    <!-- 消息对象 json 转换类 -->
+    <bean id="jsonMessageConverter" class="email2.util.FastJsonMessageConverter"/>
+
+    <!-- 定义 queue -->
+    <rabbit:queue name="test_queue" durable="true" auto-delete="false" exclusive="false" declared-by="connectAdmin"/>
+
+    <!-- 定义 direct exchange，绑定 test_queue 其实这里没有必要做绑定，消费者 只关心监听的队列即可，消息由上游服务决定发送与否 ，不过这里也添加了绑定，为的是清晰点 -->
+    <rabbit:direct-exchange name="exchangeTest" durable="true" auto-delete="false" declared-by="connectAdmin">
+        <rabbit:bindings>
+            <rabbit:binding queue="test_queue" key="test_queue"/>
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+    <!-- 消息接收者 -->
+    <bean id="messageReceiver" class="email2.consumer.MessageDirectConsumer"/>
+
+    <!-- queue litener  观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象；注意这里监听的队列 应该保持和 消息发送者端定义的一样 -->
+    <rabbit:listener-container connection-factory="connectionFactory" message-converter="jsonMessageConverter">
+        <rabbit:listener queues="test_queue" ref="messageReceiver"/>
+    </rabbit:listener-container>
+
+
+    <!-- 定义 发布订阅 queue -->
+    <rabbit:queue name="test_fanout_queue" durable="true" auto-delete="false" exclusive="false"
+                  declared-by="connectAdmin"/>
+
+    <!-- 消息接收者 -->
+    <bean id="receiverFanout" class="email2.consumer.MessageFanoutConsumer"/>
+
+    <!-- queue litener  观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener queues="test_fanout_queue" ref="receiverFanout"/>
+    </rabbit:listener-container>
+
+
+    <!-- ######################### 模糊匹配 ####################### -->
+    <!-- 配置 connection-factory，指定连接 rabprodurcerrver 参数 -->
+    <rabbit:connection-factory id="connectionFactory2"
+                               username="guest" password="guest" host="127.0.0.1" port="5672"/>
+
+    <!-- 定义 rabbit template 用于数据的接收和发送 -->
+    <rabbit:template id="amqpTemplate2" connection-factory="connectionFactory2"
+                     exchange="exchangeTest2"/>
+
+    <!-- 通过指定下面的 admin 信息，当前 producer 中的 exchange 和 queue 会在 rabbitmq 服务器上自动生成 -->
+    <rabbit:admin id="connectAdmin2" connection-factory="connectionFactory2"/>
+
+    <!-- 定义 queue -->
+    <rabbit:queue name="direct_test_queue" durable="true" auto-delete="false" exclusive="false"
+                  declared-by="connectAdmin2"/>
+
+    <!-- 定义 direct exchange，绑定 queueTest -->
+    <rabbit:topic-exchange name="exchangeTest2" durable="true" auto-delete="false" declared-by="connectAdmin2">
+        <rabbit:bindings>
+            <rabbit:binding queue="direct_test_queue" pattern="direct.*"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <!-- 消息接收者 -->
+    <bean id="recieverDirectQueue" class="email2.consumer.MessageTopicConsumer"/>
+
+    <!-- queue litener  观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+    <rabbit:listener-container connection-factory="connectionFactory2">
+        <rabbit:listener queues="direct_test_queue" ref="recieverDirectQueue"/>
+    </rabbit:listener-container>
+</beans>
